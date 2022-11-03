@@ -7,7 +7,7 @@ object Constants {
 
     const val APP_Title = "Breaking News"
     const val Base_URL = "https://newsapi.org/"
-    const val API_Key = "ff82a304e0844b7d97466153e04030dd"
+    const val API_Key = ""
     const val LOG_TAG = "MVVMOBreakingNews"
 
     var nextNewsForFragment: Article? = null
