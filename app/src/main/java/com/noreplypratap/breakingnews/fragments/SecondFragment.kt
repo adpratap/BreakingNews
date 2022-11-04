@@ -26,17 +26,5 @@ class SecondFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         nextNewsForFragment?.url?.let { binding.wvNews.loadUrl(it) }
-
-        //Glide.with(this).load(nextNewsForFragment?.urlToImage).into(binding.ivSNewsImage)
-
-//        binding.tvSNewsHeading.text = nextNewsForFragment?.title
-//        binding.tvSNewsCon.text = nextNewsForFragment?.content
-//        binding.tvSNewsBody.text = nextNewsForFragment?.description
-//        binding.tvSNewsTime.text = nextNewsForFragment?.publishedAt
-//        binding.tvSNewsAuth.text = nextNewsForFragment?.author
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
     }
 }

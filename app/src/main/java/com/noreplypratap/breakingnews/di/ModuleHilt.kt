@@ -29,16 +29,15 @@ class ModuleHilt {
     }
 
     @Provides
-    @BaseURl
+    @APIKey
     fun provideAPIKey(): String {
-        return Constants.Base_URL
+        return Constants.API_Key
     }
 
     @Provides
-    @APIKey
+    @BaseURl
     fun provideBaseURL(): String {
         return Constants.Base_URL
     }
-
 
 }
