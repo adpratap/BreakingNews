@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.noreplypratap.breakingnews.R
 import com.noreplypratap.breakingnews.model.Article
+import com.noreplypratap.breakingnews.utils.Constants.DefaultImageURl
 
 
 class CustomAdapter(private val dataSet: List<Article>) :
@@ -38,11 +39,15 @@ class CustomAdapter(private val dataSet: List<Article>) :
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
 
-        Glide.with(viewHolder.itemView).load(dataSet[position].urlToImage)
-            .into(viewHolder.imageview)
+        if(dataSet[position].urlToImage.isNullOrBlank()){
+            Glide.with(viewHolder.itemView).load(DefaultImageURl)
+                .into(viewHolder.imageview)
+        }else{
+            Glide.with(viewHolder.itemView).load(dataSet[position].urlToImage)
+                .into(viewHolder.imageview)
+        }
         viewHolder.textView.text = dataSet[position].title
-        viewHolder.textView2.text = dataSet[position].description
-
+        //viewHolder.textView2.text = dataSet[position].description
 
         viewHolder.itemView.setOnClickListener {
 
@@ -51,6 +56,6 @@ class CustomAdapter(private val dataSet: List<Article>) :
         }
     }
 
-    override fun getItemCount() = dataSet.size - 1
+    override fun getItemCount() = dataSet.size
 
 }

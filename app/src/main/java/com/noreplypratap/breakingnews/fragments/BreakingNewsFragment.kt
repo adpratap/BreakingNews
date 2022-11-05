@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.noreplypratap.breakingnews.databinding.FragmentBreakingNewsBinding
 import com.noreplypratap.breakingnews.utils.Constants.LOG_TAG
@@ -22,7 +23,6 @@ class BreakingNewsFragment : Fragment() {
 
     private lateinit var binding: FragmentBreakingNewsBinding
     private val mainViewModel: MainViewModel by viewModels()
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,9 +47,12 @@ class BreakingNewsFragment : Fragment() {
 
                 Log.d(LOG_TAG, it.toString())
 
-                nextNewsDatas = it
+                //nextNewsDatas = it
 
-                setNewsToView()
+                //setNewsToView()
+                val customAdapter = CustomAdapter(it.articles)
+                binding.rvNewsView.layoutManager = GridLayoutManager(context,2)
+                binding.rvNewsView.adapter = customAdapter
 
             }
         }
@@ -60,9 +63,8 @@ class BreakingNewsFragment : Fragment() {
     private fun setNewsToView() {
 
         val customAdapter = nextNewsDatas?.articles?.let { CustomAdapter(it) }
-
+        binding.rvNewsView.layoutManager = GridLayoutManager(context,2)
         binding.rvNewsView.adapter = customAdapter
-        binding.rvNewsView.layoutManager = LinearLayoutManager(context)
 
         if (customAdapter != null) {
             customAdapter.onItemClick = { news ->
