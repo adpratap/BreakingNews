@@ -6,7 +6,7 @@
     app:startDestination="@id/noInternetFragment">
     <fragment
         android:id="@+id/noInternetFragment"
-        android:name="com.noreplypratap.breakingnews.NoInternetFragment"
+        android:name="com.noreplypratap.breakingnews.ui.fragments.NoInternetFragment"
         android:label="fragment_no_internet"
         tools:layout="@layout/fragment_no_internet" />
 </navigation>
