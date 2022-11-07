@@ -1,4 +1,4 @@
-package com.noreplypratap.breakingnews.utils
+package com.noreplypratap.breakingnews.network
 
 import kotlinx.coroutines.flow.Flow
 
