@@ -2,11 +2,13 @@ package com.noreplypratap.breakingnews.repository
 
 import com.noreplypratap.breakingnews.model.NewsData
 import com.noreplypratap.breakingnews.api.NewsService
+import com.noreplypratap.breakingnews.db.NewsDao
+import com.noreplypratap.breakingnews.model.Article
 import retrofit2.Response
 import javax.inject.Inject
 
 
-class Repository @Inject constructor(private val newsService: NewsService) {
+class Repository @Inject constructor(private val newsService: NewsService , private val newsDao: NewsDao) {
 
     suspend fun getNewsData(countryCode : String,pageNumber: Int): Response<NewsData> {
         return newsService.loadNewsFormAPI(countryCode,pageNumber)
@@ -16,10 +18,12 @@ class Repository @Inject constructor(private val newsService: NewsService) {
         return newsService.searchNews(queryString,pageNumber)
     }
 
-//    suspend fun update(article: Article) = db.getArticleDao().upDate(article)
-//
-//    fun saveNews() = db.getArticleDao().getArticles()
-//
-//    suspend fun deleteArticle(article: Article) = db.getArticleDao().deleteArticles(article)
+    suspend fun updateInDB(article: Article) {
+        newsDao.upDate(article)
+    }
+
+    fun getDataFromDB() = newsDao.getArticles()
+
+    suspend fun deleteAllDataInDB(article: Article) = newsDao.deleteArticles(article)
 
 }

@@ -1,17 +1,21 @@
 package com.noreplypratap.breakingnews.di
 
+import android.app.Application
+import android.content.Context
 import com.noreplypratap.breakingnews.api.NewsService
+import com.noreplypratap.breakingnews.db.DatabaseArticles
+import com.noreplypratap.breakingnews.db.NewsDao
 import com.noreplypratap.breakingnews.utils.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
-
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -39,6 +43,18 @@ class ModuleHilt {
     }
 
     @Provides
+    @Singleton
+    fun provideDatabase(context: Application) : DatabaseArticles {
+        return DatabaseArticles.createDatabase(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNewsDao(databaseArticles: DatabaseArticles) : NewsDao {
+        return databaseArticles.getArticleDao()
+    }
+
+    @Provides
     @APIKey
     fun provideAPIKey(): String {
         return Constants.APIKey
@@ -49,5 +65,4 @@ class ModuleHilt {
     fun provideBaseURL(): String {
         return Constants.BaseURL
     }
-
 }

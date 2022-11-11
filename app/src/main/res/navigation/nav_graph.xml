@@ -2,11 +2,4 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
-    app:startDestination="@id/noInternetFragment">
-    <fragment
-        android:id="@+id/noInternetFragment"
-        android:name="com.noreplypratap.breakingnews.ui.fragments.NoInternetFragment"
-        android:label="fragment_no_internet"
-        tools:layout="@layout/fragment_no_internet" />
-</navigation>
+    android:id="@+id/nav_graph" />

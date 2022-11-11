@@ -13,40 +13,39 @@ import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
+class APIViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
 
-    val breakingNews : MutableLiveData<Resource<NewsData>> = MutableLiveData()
+    val breakingNews: MutableLiveData<Resource<NewsData>> = MutableLiveData()
     var breakingNewsPage = 1
-    var breakingNewsResponse : NewsData? = null
+    var breakingNewsResponse: NewsData? = null
 
-    val searchNews : MutableLiveData<Resource<NewsData>> = MutableLiveData()
+    val searchNews: MutableLiveData<Resource<NewsData>> = MutableLiveData()
     var searchNewsPage = 1
-    var searchNewsResponse : NewsData? = null
-
+    var searchNewsResponse: NewsData? = null
 
 
     fun getBreakingNews(countryCode: String) = viewModelScope.launch {
         breakingNews.postValue(Resource.Loading())
-        val response = repository.getNewsData(countryCode,breakingNewsPage)
+        val response = repository.getNewsData(countryCode, breakingNewsPage)
         breakingNews.postValue(handleNewsResponse(response))
 
     }
 
-    fun searchNews(searchQuery : String) = viewModelScope.launch {
+    fun searchNews(searchQuery: String) = viewModelScope.launch {
         searchNews.postValue(Resource.Loading())
-        val response = repository.searchNewsData(searchQuery , searchNewsPage)
+        val response = repository.searchNewsData(searchQuery, searchNewsPage)
         searchNews.postValue(handleSearchNewsResponse(response))
     }
 
-    private fun handleNewsResponse(response: Response<NewsData>) : Resource<NewsData>{
-        if (response.isSuccessful){
+    private fun handleNewsResponse(response: Response<NewsData>): Resource<NewsData> {
+        if (response.isSuccessful) {
             response.body()?.let {
                 breakingNewsPage++
-                if (breakingNewsResponse == null){
+                if (breakingNewsResponse == null) {
                     breakingNewsResponse = it
-                }else{
-                    val oldArticle  = breakingNewsResponse?.articles
+                } else {
+                    val oldArticle = breakingNewsResponse?.articles
                     val newArticle = it.articles
                     oldArticle?.addAll(newArticle)
                 }
@@ -56,14 +55,14 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
         return Resource.Error(response.message())
     }
 
-    private fun handleSearchNewsResponse(response: Response<NewsData>) : Resource<NewsData>{
-        if (response.isSuccessful){
+    private fun handleSearchNewsResponse(response: Response<NewsData>): Resource<NewsData> {
+        if (response.isSuccessful) {
             response.body()?.let {
                 searchNewsPage++
-                if (searchNewsResponse == null){
+                if (searchNewsResponse == null) {
                     searchNewsResponse = it
-                }else{
-                    val oldArticle  = searchNewsResponse?.articles
+                } else {
+                    val oldArticle = searchNewsResponse?.articles
                     val newArticle = it.articles
                     oldArticle?.addAll(newArticle)
                 }
@@ -73,14 +72,14 @@ class MainViewModel @Inject constructor(private val repository: Repository) : Vi
         return Resource.Error(response.message())
     }
 
-//    fun saveArticle(article: Article) = viewModelScope.launch {
-//        repository.update(article)
-//    }
-//
-//    fun getSavedNews() = repository.saveNews()
-//
-//    fun deleteArticles(article: Article) = viewModelScope.launch {
-//        repository.deleteArticle(article)
-//    }
+    fun saveArticle(article: Article) = viewModelScope.launch {
+        repository.updateInDB(article)
+    }
+
+    fun getSavedNews() = repository.getDataFromDB()
+
+    fun deleteArticles(article: Article) = viewModelScope.launch {
+        repository.deleteAllDataInDB(article)
+    }
 
 }

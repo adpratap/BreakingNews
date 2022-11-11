@@ -1,12 +1,13 @@
 package com.noreplypratap.breakingnews.ui.fragments
 
-import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -14,19 +15,17 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.noreplypratap.breakingnews.adapters.NewsAdapter
 import com.noreplypratap.breakingnews.databinding.FragmentBreakingNewsBinding
-import com.noreplypratap.breakingnews.ui.views.WebActivity
 import com.noreplypratap.breakingnews.utils.Constants.TAG
 import com.noreplypratap.breakingnews.utils.Resource
-import com.noreplypratap.breakingnews.utils.TempData.isOnline
-import com.noreplypratap.breakingnews.utils.TempData.onClickNewsUrl
-import com.noreplypratap.breakingnews.viewmodel.MainViewModel
+import com.noreplypratap.breakingnews.utils.isOnline
+import com.noreplypratap.breakingnews.viewmodel.APIViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class BreakingNewsFragment : Fragment() {
 
     private lateinit var binding: FragmentBreakingNewsBinding
-    private val mainViewModel: MainViewModel by viewModels()
+    private val mainViewModel: APIViewModel by viewModels()
     lateinit var newsAdapter: NewsAdapter
 
     override fun onCreateView(
@@ -40,27 +39,30 @@ class BreakingNewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if(context?.let { isOnline(it) } == true){
+        if(context?.isOnline() == true){
+            Log.d(TAG,"Load From API...")
+            apicall()
             setupPage()
         }else{
-            startActivity(Intent(context,WebActivity::class.java))
+            Log.d(TAG,"Load From DB...")
         }
 
     }
 
-    private fun setupPage() {
-        setRecyclerView()
-        newsAdapter.setOnClickListener {
-            Log.d(TAG,"clicked....................")
-            onClickNewsUrl = it.url
-            startActivity(Intent(context,WebActivity::class.java))
-        }
-
+    private fun apicall() {
         mainViewModel.getBreakingNews("in")
-        mainViewModel.breakingNews.observe(viewLifecycleOwner, Observer { data ->
 
+    }
+
+
+    private fun setupPage() {
+
+        setRecyclerView()
+
+        mainViewModel.breakingNews.observe(viewLifecycleOwner, Observer { data ->
             when(data){
                 is Resource.Success -> {
+
                     hideProgressBar()
                     data.data?.let {
                         newsAdapter.differ.submitList(it.articles.toList())
@@ -79,6 +81,7 @@ class BreakingNewsFragment : Fragment() {
                 }
             }
         })
+
     }
 
     private fun hideProgressBar() {
@@ -112,7 +115,7 @@ class BreakingNewsFragment : Fragment() {
             val isTotalMoreThenVisible = totalItemCount >= 20
             val shouldPaginate = isNotLoadingAndLastPage && isAtLastItem && isNotAtBeginning && isTotalMoreThenVisible && isScrolling
 
-            if (shouldPaginate && context?.let { isOnline(it) } == true){
+            if (shouldPaginate && context?.isOnline() == true){
                 mainViewModel.getBreakingNews("in")
                 isScrolling = false
             }
@@ -124,6 +127,21 @@ class BreakingNewsFragment : Fragment() {
             adapter = newsAdapter
             layoutManager = GridLayoutManager(activity,2)
             addOnScrollListener(this@BreakingNewsFragment.scrollListner)
+        }
+
+        newsAdapter.setOnClickListener {
+            mainViewModel.saveArticle(it)
+            val m = mainViewModel.getSavedNews()
+            Log.d(TAG, "Saved to db")
+            val v = m.value
+            Log.d(TAG, v.toString())
+            if (context?.isOnline() == true){
+                val customTabsIntent = CustomTabsIntent.Builder().build()
+                context?.let { it1 -> customTabsIntent.launchUrl(it1,Uri.parse(it.url) )}
+            }else{
+                Log.d(TAG,"No Internet")
+            }
+
         }
     }
 

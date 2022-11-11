@@ -1,12 +1,15 @@
 package com.noreplypratap.breakingnews.ui.fragments
 
-import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AbsListView
-import androidx.fragment.app.Fragment
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -14,11 +17,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.noreplypratap.breakingnews.R
 import com.noreplypratap.breakingnews.adapters.NewsAdapter
 import com.noreplypratap.breakingnews.databinding.FragmentSearchBinding
-import com.noreplypratap.breakingnews.ui.views.WebActivity
 import com.noreplypratap.breakingnews.utils.Constants
 import com.noreplypratap.breakingnews.utils.Resource
-import com.noreplypratap.breakingnews.utils.TempData
-import com.noreplypratap.breakingnews.viewmodel.MainViewModel
+import com.noreplypratap.breakingnews.utils.isOnline
+import com.noreplypratap.breakingnews.viewmodel.APIViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
@@ -29,7 +31,7 @@ import kotlinx.coroutines.launch
 class SearchFragment : Fragment(R.layout.fragment_search) {
 
     private lateinit var binding: FragmentSearchBinding
-    val mainViewModel : MainViewModel by viewModels()
+    val mainViewModel : APIViewModel by viewModels()
     lateinit var newsAdapter: NewsAdapter
 
     override fun onCreateView(
@@ -51,22 +53,17 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             job = MainScope().launch {
                 delay(500L)
                 it?.let {
-                    if (it.toString().isNotEmpty()){
+                    if (it.toString().isNotEmpty() && context?.isOnline() == true){
                         mainViewModel.searchNews(it.toString())
+
                     }else{
                         newsAdapter.differ.submitList(null)
                     }
                 }
             }
         }
+
         setRecyclerView()
-
-        newsAdapter.setOnClickListener {
-            Log.d(Constants.TAG,"Itemclicked....................")
-            TempData.onClickNewsUrl = it.url
-            startActivity(Intent(context, WebActivity::class.java))
-        }
-
         mainViewModel.searchNews.observe(viewLifecycleOwner, Observer { data ->
             when(data){
                 is Resource.Success -> {
@@ -122,7 +119,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             val isTotalMoreThenVisible = totalItemCount >= 20
             val shouldPaginate = isNotLoadingAndLastPage && isAtLastItem && isNotAtBeginning && isTotalMoreThenVisible && isScrolling
 
-            if (shouldPaginate && context?.let { TempData.isOnline(it) } == true){
+            if (shouldPaginate && context?.isOnline() == true){
                 mainViewModel.searchNews(binding.etSearchFragment.text.toString())
                 isScrolling = false
             }
@@ -135,6 +132,15 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             adapter = newsAdapter
             layoutManager = GridLayoutManager(activity,2)
             addOnScrollListener(this@SearchFragment.scrollListner)
+        }
+
+        newsAdapter.setOnClickListener {
+            if (context?.isOnline() == true){
+                val customTabsIntent = CustomTabsIntent.Builder().build()
+                context?.let { it1 -> customTabsIntent.launchUrl(it1,Uri.parse(it.url) )}
+            }else{
+                Log.d(Constants.TAG,"No Internet")
+            }
         }
     }
 
