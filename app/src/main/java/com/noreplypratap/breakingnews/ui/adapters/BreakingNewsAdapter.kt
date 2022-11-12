@@ -1,4 +1,4 @@
-package com.noreplypratap.breakingnews.adapters
+package com.noreplypratap.breakingnews.ui.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +13,7 @@ import com.noreplypratap.breakingnews.R
 import com.noreplypratap.breakingnews.model.Article
 import com.noreplypratap.breakingnews.utils.Constants
 
-class NewsAdapter : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
+class BreakingNewsAdapter : RecyclerView.Adapter<BreakingNewsAdapter.ArticleViewHolder>() {
 
     class ArticleViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
         var textView: TextView

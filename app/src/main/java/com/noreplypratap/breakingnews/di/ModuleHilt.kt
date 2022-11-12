@@ -1,15 +1,13 @@
 package com.noreplypratap.breakingnews.di
 
 import android.app.Application
-import android.content.Context
 import com.noreplypratap.breakingnews.api.NewsService
 import com.noreplypratap.breakingnews.db.DatabaseArticles
-import com.noreplypratap.breakingnews.db.NewsDao
+import com.noreplypratap.breakingnews.db.NewsArticleDao
 import com.noreplypratap.breakingnews.utils.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -36,7 +34,7 @@ class ModuleHilt {
 
     @Provides
     @Singleton
-    fun providesclient() : OkHttpClient {
+    fun provideClient() : OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         return OkHttpClient.Builder().addInterceptor(loggingInterceptor).build()
@@ -50,7 +48,7 @@ class ModuleHilt {
 
     @Provides
     @Singleton
-    fun provideNewsDao(databaseArticles: DatabaseArticles) : NewsDao {
+    fun provideNewsDao(databaseArticles: DatabaseArticles) : NewsArticleDao {
         return databaseArticles.getArticleDao()
     }
 

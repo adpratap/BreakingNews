@@ -9,11 +9,12 @@ import com.noreplypratap.breakingnews.model.Article
 
 @Database(
     entities = [Article::class],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class DatabaseArticles : RoomDatabase() {
-    abstract fun getArticleDao() : NewsDao
+    abstract fun getArticleDao() : NewsArticleDao
 
     companion object{
         @Volatile
@@ -26,7 +27,7 @@ abstract class DatabaseArticles : RoomDatabase() {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
                         DatabaseArticles::class.java,
-                        "mydb"
+                        "myDBNewsData"
                     ).build()
                 }
             }

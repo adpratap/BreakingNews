@@ -9,15 +9,15 @@ import androidx.room.Query
 import com.noreplypratap.breakingnews.model.Article
 
 @Dao
-interface NewsDao {
+interface NewsArticleDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upDate(article: Article):Long
+    suspend fun saveArticleToDatabase(article: List<Article>)
 
     @Query("SELECT * From articles")
-    fun getArticles() : LiveData<List<Article>>
+    fun getArticlesFromDatabase() : LiveData<List<Article>>
 
-    @Delete
-    suspend fun deleteArticles(article: Article)
+    @Query("DELETE FROM articles")
+    suspend fun deleteDB()
 
 }
