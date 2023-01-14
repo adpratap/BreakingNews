@@ -6,5 +6,5 @@ object Constants {
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQsq1NacYKHKS-RudSBgbLZa_ndkD-lmmQfA&usqp=CAU"
     const val TAG = "MVVMOBreakingNews"
     const val pageSize : Int = 20
-    val APIKey = getAPIKey()
+    val APIKey = "put your key here ..."
 }
