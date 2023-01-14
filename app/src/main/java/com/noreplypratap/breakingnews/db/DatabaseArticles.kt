@@ -27,7 +27,7 @@ abstract class DatabaseArticles : RoomDatabase() {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
                         DatabaseArticles::class.java,
-                        "myDBNewsData"
+                        "OfflineNewsDataBase"
                     ).build()
                 }
             }

@@ -12,12 +12,18 @@ import com.noreplypratap.breakingnews.model.Article
 interface NewsArticleDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveArticleToDatabase(article: List<Article>)
+    suspend fun saveArticle(article: List<Article>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveFavNews(article: Article)
 
     @Query("SELECT * From articles")
-    fun getArticlesFromDatabase() : LiveData<List<Article>>
+    fun getArticlesRoomDB() : LiveData<List<Article>>
 
     @Query("DELETE FROM articles")
-    suspend fun deleteDB()
+    suspend fun deleteRoomDB()
+
+    @Delete
+    suspend fun deleteFavNews(article: Article)
 
 }

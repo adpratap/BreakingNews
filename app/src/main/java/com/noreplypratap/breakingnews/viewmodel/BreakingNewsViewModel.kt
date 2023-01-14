@@ -17,37 +17,22 @@ import javax.inject.Inject
 class BreakingNewsViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     val breakingNews : MutableLiveData<Resource<NewsData>> = MutableLiveData()
-    var breakingNewsPage = 1
     var breakingNewsResponse : NewsData? = null
 
-    fun getBreakingNews(countryCode: String) = viewModelScope.launch {
+    fun getBreakingNews(countryCode: String,category : String,query : String) = viewModelScope.launch {
         breakingNews.postValue(Resource.Loading())
-        val response = repository.getNewsData(countryCode, breakingNewsPage)
+        val response = repository.getNewsData(countryCode,category,query)
         breakingNews.postValue(handleNewsResponse(response))
     }
 
     private fun handleNewsResponse(response: Response<NewsData>): Resource<NewsData> {
         if (response.isSuccessful) {
             response.body()?.let {
-                breakingNewsPage++
-                if (breakingNewsResponse == null) {
                     breakingNewsResponse = it
-                } else {
-                    val oldArticle = breakingNewsResponse?.articles
-                    val newArticle = it.articles
-                    oldArticle?.addAll(newArticle)
-                }
                 return Resource.Success(breakingNewsResponse ?: it)
             }
         }
         return Resource.Error(response.message())
     }
 
-    fun getSavedBreakingNews() : LiveData<List<Article>> {
-        return repository.getArticleFromDB()
-    }
-
-    fun saveNews(articles: List<Article>) = viewModelScope.launch {
-        repository.saveArticleToDB(articles)
-    }
 }

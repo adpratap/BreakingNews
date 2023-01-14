@@ -1,112 +1,301 @@
 package com.noreplypratap.breakingnews.ui.fragments
 
 import android.annotation.SuppressLint
-import android.net.Uri
+import android.app.DatePickerDialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.*
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.widget.addTextChangedListener
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.noreplypratap.breakingnews.R
 import com.noreplypratap.breakingnews.databinding.FragmentSearchBinding
-import com.noreplypratap.breakingnews.ui.adapters.SearchNewsAdapter
-import com.noreplypratap.breakingnews.utils.Constants
-import com.noreplypratap.breakingnews.utils.Resource
-import com.noreplypratap.breakingnews.utils.isOnline
+import com.noreplypratap.breakingnews.ui.adapters.BreakingNewsAdapter
+import com.noreplypratap.breakingnews.utils.*
+import com.noreplypratap.breakingnews.viewmodel.BreakingNewsViewModel
+import com.noreplypratap.breakingnews.viewmodel.RoomDBViewModel
 import com.noreplypratap.breakingnews.viewmodel.SearchNewsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
+
 
 @AndroidEntryPoint
 class SearchNewsFragment : Fragment(R.layout.fragment_search) {
 
     private lateinit var binding: FragmentSearchBinding
-    private val mainViewModel: SearchNewsViewModel by viewModels()
-    private lateinit var searchNewsAdapter: SearchNewsAdapter
+    private val searchViewModel: SearchNewsViewModel by viewModels()
+    private val mainViewModel: BreakingNewsViewModel by viewModels()
+    private val roomDBViewModel: RoomDBViewModel by viewModels()
+    private lateinit var dialog : BottomSheetDialog
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSearchBinding.bind(view)
-        setObserver()
-        if (context?.isOnline() == true) {
-            searchNews()
 
+        val newsAdapter = BreakingNewsAdapter()
+        binding.rvSearchFragment.adapter = newsAdapter
+        recyclerViewOnClick(newsAdapter)
+
+        setObserver(newsAdapter)
+        mainViewModelObs(newsAdapter)
+        appBarSetup(newsAdapter)
+        setupChips()
+
+    }
+
+    private fun appBarSetup(newsAdapter: BreakingNewsAdapter) {
+        val textView  = activity?.findViewById<TextView>(R.id.tvAppBar)
+        val searchView  = activity?.findViewById<SearchView>(R.id.svAppBarSearch)
+        val imageButton  = activity?.findViewById<ImageButton>(R.id.ibFilterBtn)
+        if (searchView != null) {
+            searchView.visibility = View.VISIBLE
+            searchView.requestFocus()
+            searchView.isIconified = false
+            val inputMethodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT)
+            svSearch(searchView,newsAdapter)
+        }
+
+        imageButton?.setOnClickListener {
+
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val datePicker = DatePicker(context)
+            val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+            val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
+            val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+            datePicker.init(currentYear, currentMonth, currentDay) { _, year, month, day ->
+                val selectedDate = Calendar.getInstance().apply {
+                    set(year, month, day)
+                }.time
+                val dateString = dateFormat.format(selectedDate)
+            }
+            val layout = LinearLayout(context)
+            layout.addView(datePicker)
+            context?.let { it1 ->
+                AlertDialog.Builder(it1)
+                    .setView(layout)
+                    .setPositiveButton("OK") { _, _ ->
+                        // dateString variable holds the selected date in the desired format "yyyy-MM-dd"
+                    }
+                    .create()
+                    .show()
+            }
+
+            logging(dateFormat.toString())
+        }
+        if (textView != null) {
+            textView.visibility = View.GONE
+        }
+
+        if (imageButton != null) {
+            imageButton.visibility = View.VISIBLE
         }
     }
 
-    private fun setObserver() {
-        mainViewModel.searchNews.observe(viewLifecycleOwner, Observer { data ->
+    @SuppressLint("NotifyDataSetChanged")
+    private fun mainViewModelObs(newsAdapter: BreakingNewsAdapter) {
+        mainViewModel.breakingNews.observe(viewLifecycleOwner) { data ->
             when (data) {
                 is Resource.Success -> {
-                    hideProgressBar()
                     data.data?.let {
-                        searchNewsAdapter = SearchNewsAdapter(it.articles)
-                        setRecyclerView()
+                        newsAdapter.differ.submitList(it.articles)
+                        newsAdapter.notifyDataSetChanged()
                     }
+                    hideProgressBar()
                 }
                 is Resource.Error -> {
                     hideProgressBar()
-                    data.message?.let {
-                        Log.d(Constants.TAG, it)
-                    }
+                    logging(data.message.toString())
                 }
                 is Resource.Loading -> {
                     showProgressBar()
                 }
             }
+        }
+    }
+
+    private fun setupChips() {
+        binding.chipBusiness.setOnClickListener {
+            binding.chipsCategoryGroup.clearCheck()
+            binding.chipBusiness.isChecked = true
+            if (binding.chipBusiness.isChecked) {
+                mainViewModel.getBreakingNews("","business","")
+            }
+        }
+        binding.chipEntertainment.setOnClickListener {
+            binding.chipsCategoryGroup.clearCheck()
+            binding.chipEntertainment.isChecked = true
+            if (binding.chipEntertainment.isChecked) {
+                mainViewModel.getBreakingNews("","entertainment","")
+            }
+        }
+        binding.chipGeneral.setOnClickListener {
+            binding.chipsCategoryGroup.clearCheck()
+            binding.chipGeneral.isChecked = true
+            if (binding.chipGeneral.isChecked) {
+                mainViewModel.getBreakingNews("","general","")
+            }
+        }
+        binding.chipHealth.setOnClickListener {
+            binding.chipsCategoryGroup.clearCheck()
+            binding.chipHealth.isChecked = true
+            if (binding.chipHealth.isChecked) {
+                mainViewModel.getBreakingNews("","health","")
+            }
+        }
+        binding.chipScience.setOnClickListener {
+            binding.chipsCategoryGroup.clearCheck()
+            binding.chipScience.isChecked = true
+            if (binding.chipScience.isChecked) {
+                mainViewModel.getBreakingNews("","science","")
+            }
+        }
+        binding.chipSports.setOnClickListener {
+            binding.chipsCategoryGroup.clearCheck()
+            binding.chipSports.isChecked = true
+            if (binding.chipSports.isChecked) {
+                mainViewModel.getBreakingNews("","sports","")
+            }
+        }
+        binding.chipTechnology.setOnClickListener {
+            binding.chipsCategoryGroup.clearCheck()
+            binding.chipTechnology.isChecked = true
+            if (binding.chipTechnology.isChecked) {
+                mainViewModel.getBreakingNews("","technology","")
+            }
+        }
+    }
+
+    private fun svSearch(searchView: SearchView, newsAdapter: BreakingNewsAdapter) {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                searchNews(query, newsAdapter)
+                return true
+            }
+
+            var job: Job? = null
+            override fun onQueryTextChange(newText: String?): Boolean {
+                job?.cancel()
+                job = MainScope().launch {
+                    delay(500L)
+                    newText.let {
+                        Log.d("onQueryTextChange...", newText.toString())
+                        searchNews(newText, newsAdapter)
+                    }
+                }
+                return true
+            }
+
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+        val textView  = activity?.findViewById<TextView>(R.id.tvAppBar)
+        val searchView  = activity?.findViewById<SearchView>(R.id.svAppBarSearch)
+        val imageButton  = activity?.findViewById<ImageButton>(R.id.ibFilterBtn)
+        if (searchView != null) {
+            searchView.visibility = View.VISIBLE
+            searchView.requestFocus()
+            searchView.isIconified = false
+        }
+
+        if (textView != null) {
+            textView.visibility = View.GONE
+        }
+
+        if (imageButton != null) {
+            imageButton.visibility = View.VISIBLE
+        }
+    }
+    private fun recyclerViewOnClick(adapter: BreakingNewsAdapter) {
+        adapter.setOnClickListener {
+            val dialogView = layoutInflater.inflate(R.layout.bottom_sheet,null)
+            it.urlToImage?.let { it1 -> requireContext().glide(it1,dialogView.findViewById(R.id.imageView)) }
+            dialogView.findViewById<TextView>(R.id.tvTitle).text = it.title.toString()
+            if (it.description.isNullOrEmpty()) {
+                dialogView.findViewById<TextView>(R.id.tvDesc).text = it.description.toString()
+            }
+            dialogView.findViewById<TextView>(R.id.tvTime).text = it.publishedAt.toString()
+            dialogView.findViewById<Button>(R.id.btnURL).setOnClickListener { _ ->
+                if (context?.isOnline() == true) {
+                    it.url?.let { it1 -> requireContext().webBuilder(it1) }
+                } else {
+                    logging("No Internet")
+                    requireContext().showToast("No Internet")
+                }
+            }
+            dialog = BottomSheetDialog(requireContext(),R.style.BottomSheetDialogTheme)
+            dialog.setContentView(dialogView)
+            dialog.show()
+
+            roomDBViewModel.saveFavNews(it)
+        }
+    }
+
     @SuppressLint("NotifyDataSetChanged")
-    private fun searchNews() {
-        var job: Job? = null
-        binding.etSearchFragment.addTextChangedListener {
-            job?.cancel()
-            job = MainScope().launch {
-                delay(500L)
-                it?.let {
-                    if (it.toString().isNotEmpty() && context?.isOnline() == true) {
-                        mainViewModel.searchNews(it.toString())
-                    } else {
-                        if (context?.isOnline() == true) {
-                            searchNewsAdapter.articles.clear()
-                            searchNewsAdapter.notifyDataSetChanged()
-                        }
+    private fun setObserver(adapter: BreakingNewsAdapter) {
+        searchViewModel.searchNews.observe(viewLifecycleOwner) { data ->
+            when (data) {
+                is Resource.Success -> {
+                    data.data?.let {
+                        adapter.differ.submitList(it.articles)
+                        adapter.notifyDataSetChanged()
                     }
+                    hideProgressBar()
+                }
+                is Resource.Error -> {
+                    hideProgressBar()
+                    logging(data.message.toString())
+                }
+                is Resource.Loading -> {
+                    showProgressBar()
                 }
             }
         }
     }
 
-    private fun hideProgressBar() {
+    @SuppressLint("NotifyDataSetChanged")
+    private fun searchNews(sText: String?, adapter: BreakingNewsAdapter) {
+        if (sText!!.isNotEmpty() && sText != "" && context?.isOnline() == true) {
+            searchViewModel.searchNews(sText)
+            binding.chipsCategoryGroup.clearCheck()
+        } else {
+            context?.showToast("Empty text ..... ")
+            adapter.differ.submitList(null)
+            adapter.notifyDataSetChanged()
+        }
+    }
 
+    private fun hideProgressBar() {
+        binding.SearchNewsProgressBar.visibility = View.GONE
     }
 
     private fun showProgressBar() {
-
+        binding.SearchNewsProgressBar.visibility = View.VISIBLE
     }
 
-    private fun setRecyclerView() {
-        binding.rvSearchFragment.apply {
-            adapter = searchNewsAdapter
-            layoutManager = GridLayoutManager(activity, 2)
-        }
-
-        searchNewsAdapter.setOnClickListener {
-            if (context?.isOnline() == true) {
-                val customTabsIntent = CustomTabsIntent.Builder().build()
-                context?.let { it1 -> customTabsIntent.launchUrl(it1, Uri.parse(it.url)) }
-            } else {
-                Log.d(Constants.TAG, "No Internet")
-            }
+    override fun onPause() {
+        super.onPause()
+        val searchView  = activity?.findViewById<SearchView>(R.id.svAppBarSearch)
+        val inputMethodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (searchView != null) {
+            inputMethodManager.hideSoftInputFromWindow(searchView.windowToken, 0)
+            searchView.clearFocus()
         }
     }
 
 }
+

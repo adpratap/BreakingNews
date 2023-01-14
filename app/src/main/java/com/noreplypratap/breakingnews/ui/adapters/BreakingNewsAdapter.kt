@@ -8,10 +8,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.noreplypratap.breakingnews.R
 import com.noreplypratap.breakingnews.model.Article
 import com.noreplypratap.breakingnews.utils.Constants
+import com.noreplypratap.breakingnews.utils.glide
 
 class BreakingNewsAdapter : RecyclerView.Adapter<BreakingNewsAdapter.ArticleViewHolder>() {
 
@@ -27,15 +27,14 @@ class BreakingNewsAdapter : RecyclerView.Adapter<BreakingNewsAdapter.ArticleView
         }
     }
 
+
     private val diffCallBack = object : DiffUtil.ItemCallback<Article>(){
         override fun areItemsTheSame(oldItem: Article, newItem: Article): Boolean {
             return oldItem.url == newItem.url
         }
-
         override fun areContentsTheSame(oldItem: Article, newItem: Article): Boolean {
             return oldItem == newItem
         }
-
     }
 
     val differ = AsyncListDiffer(this,diffCallBack)
@@ -54,11 +53,9 @@ class BreakingNewsAdapter : RecyclerView.Adapter<BreakingNewsAdapter.ArticleView
 
         holder.itemView.apply {
             if(article.urlToImage.isNullOrBlank()){
-                Glide.with(this).load(Constants.DefaultImageURl)
-                    .into(holder.imageview)
+                context.glide(Constants.DefaultImageURl,holder.imageview)
             }else{
-                Glide.with(this).load(article.urlToImage)
-                    .into(holder.imageview)
+                context.glide(article.urlToImage,holder.imageview)
             }
             holder.textView.text = article.title
 
@@ -71,9 +68,7 @@ class BreakingNewsAdapter : RecyclerView.Adapter<BreakingNewsAdapter.ArticleView
 
     }
 
-    override fun getItemCount(): Int {
-       return differ.currentList.size
-    }
+    override fun getItemCount() = differ.currentList.size
 
     private var onItemClicked : ((Article) -> Unit)? = null
 

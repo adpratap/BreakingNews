@@ -15,26 +15,18 @@ import javax.inject.Inject
 class SearchNewsViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     val searchNews: MutableLiveData<Resource<NewsData>> = MutableLiveData()
-    var searchNewsPage = 1
     var searchNewsResponse: NewsData? = null
 
     fun searchNews(searchQuery: String) = viewModelScope.launch {
         searchNews.postValue(Resource.Loading())
-        val response = repository.searchNewsData(searchQuery, searchNewsPage)
+        val response = repository.searchNewsData(searchQuery)
         searchNews.postValue(handleSearchNewsResponse(response))
     }
 
     private fun handleSearchNewsResponse(response: Response<NewsData>): Resource<NewsData> {
         if (response.isSuccessful) {
             response.body()?.let {
-                searchNewsPage++
-                if (searchNewsResponse == null) {
                     searchNewsResponse = it
-                } else {
-                    val oldArticle = searchNewsResponse?.articles
-                    val newArticle = it.articles
-                    oldArticle?.addAll(newArticle)
-                }
                 return Resource.Success(searchNewsResponse ?: it)
             }
         }

@@ -1,5 +1,6 @@
 package com.noreplypratap.breakingnews.ui.adapters
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +12,7 @@ import com.noreplypratap.breakingnews.R
 import com.noreplypratap.breakingnews.model.Article
 import com.noreplypratap.breakingnews.utils.Constants
 
-class SearchNewsAdapter(val articles: MutableList<Article>) : RecyclerView.Adapter<SearchNewsAdapter.ArticleViewHolder>() {
+class SearchNewsAdapter(private var articles : MutableList<Article>) : RecyclerView.Adapter<SearchNewsAdapter.ArticleViewHolder>() {
 
     class ArticleViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
         var textView: TextView
@@ -23,6 +24,12 @@ class SearchNewsAdapter(val articles: MutableList<Article>) : RecyclerView.Adapt
             textView2 = itemView.findViewById(R.id.tvFNewsBody)
             imageview = itemView.findViewById(R.id.ivFNewsImage)
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun newList(nList : MutableList<Article>){
+        articles = nList
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleViewHolder {
@@ -57,9 +64,7 @@ class SearchNewsAdapter(val articles: MutableList<Article>) : RecyclerView.Adapt
 
     }
 
-    override fun getItemCount(): Int {
-        return articles.size
-    }
+    override fun getItemCount() = articles.size
 
     private var onItemClicked : ((Article) -> Unit)? = null
 

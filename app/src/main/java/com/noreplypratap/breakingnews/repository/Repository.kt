@@ -10,18 +10,26 @@ import javax.inject.Inject
 
 class Repository @Inject constructor(private val newsService: NewsService , private val newsArticleDao: NewsArticleDao) {
 
-    suspend fun getNewsData(countryCode : String,pageNumber: Int): Response<NewsData> {
-        return newsService.loadNewsFormAPI(countryCode,pageNumber)
+    suspend fun getNewsData(countryCode : String,category : String,q : String): Response<NewsData> {
+        return newsService.loadNewsFormAPI(countryCode,category,q)
     }
 
-    suspend fun searchNewsData(queryString : String,pageNumber: Int): Response<NewsData> {
-        return newsService.searchNews(queryString,pageNumber)
+    suspend fun searchNewsData(queryString : String): Response<NewsData> {
+        return newsService.searchNews(queryString)
     }
 
-    suspend fun saveArticleToDB(article: List<Article>) {
-        newsArticleDao.saveArticleToDatabase(article)
+    suspend fun saveArticle(articles: MutableList<Article>) {
+        newsArticleDao.saveArticle(articles)
     }
 
-    fun getArticleFromDB() = newsArticleDao.getArticlesFromDatabase()
+    suspend fun saveFavNews(article: Article) {
+        newsArticleDao.saveFavNews(article)
+    }
+
+    fun getArticleRoomDB() = newsArticleDao.getArticlesRoomDB()
+
+    suspend fun deleteFavNew(article: Article) {
+        newsArticleDao.deleteFavNews(article)
+    }
 
 }
