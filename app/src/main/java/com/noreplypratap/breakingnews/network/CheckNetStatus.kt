@@ -4,8 +4,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
-import java.net.InetSocketAddress
-import java.net.Socket
 
 fun Context.isOnline() : Boolean {
     val connectivityManager =

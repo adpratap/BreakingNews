@@ -2,7 +2,6 @@ package com.noreplypratap.breakingnews.ui.views
 
 import android.content.res.Resources.NotFoundException
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.DataBindingUtil

@@ -16,15 +16,6 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="SplashActivity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowBackground">@drawable/splash_screen</item>
-        <item name="android:windowFullscreen">true</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="statusBarBackground">#E30D0D</item>
-        <item name="android:windowActivityTransitions">true</item>
-    </style>
-
     <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
 

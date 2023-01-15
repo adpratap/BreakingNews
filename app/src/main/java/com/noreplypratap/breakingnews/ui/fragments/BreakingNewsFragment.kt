@@ -7,17 +7,15 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
-import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.noreplypratap.breakingnews.R
 import com.noreplypratap.breakingnews.databinding.FragmentBreakingNewsBinding
-import com.noreplypratap.breakingnews.ui.adapters.BreakingNewsAdapter
+import com.noreplypratap.breakingnews.ui.adapters.NewsAdapter
 import com.noreplypratap.breakingnews.utils.*
 import com.noreplypratap.breakingnews.viewmodel.BreakingNewsViewModel
 import com.noreplypratap.breakingnews.viewmodel.RoomDBViewModel
-import com.noreplypratap.breakingnews.viewmodel.SearchNewsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -32,14 +30,14 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentBreakingNewsBinding.bind(view)
 
-        val newsAdapter = BreakingNewsAdapter()
+        val newsAdapter = NewsAdapter()
         binding.rvNewsView.adapter = newsAdapter
         recyclerViewOnClick(newsAdapter)
 
         hitAPI(newsAdapter)
 
         binding.strNewsArticle.setOnRefreshListener {
-            mainViewModel.getBreakingNews(codeIndia,"","")
+            mainViewModel.getBreakingNews(codeIndia, "", "")
             binding.strNewsArticle.isRefreshing = false
             binding.chipsGroup.clearCheck()
             binding.chipIndia.isChecked = true
@@ -50,7 +48,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
 
     }
 
-    private fun setupChips(newsAdapter: BreakingNewsAdapter) {
+    private fun setupChips(newsAdapter: NewsAdapter) {
 
         binding.chipUS.setOnClickListener {
             binding.chipsGroup.clearCheck()
@@ -103,10 +101,10 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun searchByChips(newsAdapter: BreakingNewsAdapter, codeUS: String) {
+    private fun searchByChips(newsAdapter: NewsAdapter, codeUS: String) {
         newsAdapter.differ.submitList(null)
         newsAdapter.notifyDataSetChanged()
-        mainViewModel.getBreakingNews(codeUS,"","")
+        mainViewModel.getBreakingNews(codeUS, "", "")
     }
 
     override fun onResume() {
@@ -121,6 +119,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
 
         if (textView != null) {
             textView.visibility = View.VISIBLE
+            textView.text = "Breaking News"
         }
 
         if (imageButton != null) {
@@ -129,7 +128,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
 
     }
 
-    private fun hitAPI(adapter: BreakingNewsAdapter) {
+    private fun hitAPI(adapter: NewsAdapter) {
         binding.chipIndia.isChecked = true
         if (context?.isOnline() == true) {
             subscribeUI(adapter)
@@ -149,7 +148,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun offlineData(adapter: BreakingNewsAdapter) {
+    private fun offlineData(adapter: NewsAdapter) {
         roomDBViewModel.getSavedNews().observe(viewLifecycleOwner) {
             adapter.differ.submitList(it)
             adapter.notifyDataSetChanged()
@@ -157,9 +156,9 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun subscribeUI(adapter: BreakingNewsAdapter) {
+    private fun subscribeUI(adapter: NewsAdapter) {
         showProgressBar()
-        mainViewModel.getBreakingNews(codeIndia,"","")
+        mainViewModel.getBreakingNews(codeIndia, "", "")
         mainViewModel.breakingNews.observe(viewLifecycleOwner) { data ->
             when (data) {
                 is Resource.Success -> {
@@ -185,7 +184,8 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
         }
     }
 
-    private fun recyclerViewOnClick(newsAdapter: BreakingNewsAdapter) {
+    @SuppressLint("InflateParams")
+    private fun recyclerViewOnClick(newsAdapter: NewsAdapter) {
         newsAdapter.setOnClickListener { news ->
             val dialogView = layoutInflater.inflate(R.layout.bottom_sheet, null)
             news.urlToImage?.let { it1 ->
@@ -195,14 +195,12 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
                 )
             }
             dialogView.findViewById<TextView>(R.id.tvTitle).text = news.title.toString()
-            if (news.description.isNullOrEmpty()) {
-                dialogView.findViewById<TextView>(R.id.tvDesc).text = news.description.toString()
-            }
+            dialogView.findViewById<TextView>(R.id.tvDesc).text = news.description.toString()
             dialogView.findViewById<TextView>(R.id.tvTime).text = news.publishedAt.toString()
             dialog = BottomSheetDialog(requireContext(), R.style.BottomSheetDialogTheme)
             dialog.setContentView(dialogView)
             dialog.show()
-            dialogView.findViewById<Button>(R.id.btnURL).setOnClickListener { _ ->
+            dialogView.findViewById<Button>(R.id.btnURL).setOnClickListener {
                 if (context?.isOnline() == true) {
                     news.url?.let { it1 -> requireContext().webBuilder(it1) }
                 } else {
