@@ -105,53 +105,60 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search) {
             binding.chipsCategoryGroup.clearCheck()
             binding.chipBusiness.isChecked = true
             if (binding.chipBusiness.isChecked) {
-                mainViewModel.getBreakingNews("", "business", "")
+                apiCall("business")
             }
         }
         binding.chipEntertainment.setOnClickListener {
             binding.chipsCategoryGroup.clearCheck()
             binding.chipEntertainment.isChecked = true
             if (binding.chipEntertainment.isChecked) {
-                mainViewModel.getBreakingNews("", "entertainment", "")
+                apiCall("entertainment")
             }
         }
         binding.chipGeneral.setOnClickListener {
             binding.chipsCategoryGroup.clearCheck()
             binding.chipGeneral.isChecked = true
             if (binding.chipGeneral.isChecked) {
-                mainViewModel.getBreakingNews("", "general", "")
+                apiCall("general")
             }
         }
         binding.chipHealth.setOnClickListener {
             binding.chipsCategoryGroup.clearCheck()
             binding.chipHealth.isChecked = true
             if (binding.chipHealth.isChecked) {
-                mainViewModel.getBreakingNews("", "health", "")
+                apiCall("health")
             }
         }
         binding.chipScience.setOnClickListener {
             binding.chipsCategoryGroup.clearCheck()
             binding.chipScience.isChecked = true
             if (binding.chipScience.isChecked) {
-                mainViewModel.getBreakingNews("", "science", "")
+                apiCall("science")
             }
         }
         binding.chipSports.setOnClickListener {
             binding.chipsCategoryGroup.clearCheck()
             binding.chipSports.isChecked = true
             if (binding.chipSports.isChecked) {
-                mainViewModel.getBreakingNews("", "sports", "")
+                apiCall("sports")
             }
         }
         binding.chipTechnology.setOnClickListener {
             binding.chipsCategoryGroup.clearCheck()
             binding.chipTechnology.isChecked = true
             if (binding.chipTechnology.isChecked) {
-                mainViewModel.getBreakingNews("", "technology", "")
+                apiCall("technology")
             }
         }
     }
 
+    private fun apiCall(category : String){
+        if (context?.isOnline() == true) {
+            mainViewModel.getBreakingNews("", category, "")
+        } else {
+            requireContext().showToast("No Internet...")
+        }
+    }
     private fun svSearch(searchView: SearchView, newsAdapter: NewsAdapter) {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
@@ -253,7 +260,7 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search) {
             searchViewModel.searchNews(sText)
             binding.chipsCategoryGroup.clearCheck()
         } else {
-            context?.showToast("Empty text ..... ")
+            context?.showToast("Error ..... ")
             adapter.differ.submitList(null)
             adapter.notifyDataSetChanged()
         }

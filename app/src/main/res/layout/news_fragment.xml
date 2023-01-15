@@ -17,9 +17,9 @@
 
         <ImageView
             android:id="@+id/ivFNewsImage"
+            android:scaleType="centerCrop"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:contentDescription="TODO"
+            android:layout_height="250dp"
             tools:ignore="ContentDescription" />
 
 

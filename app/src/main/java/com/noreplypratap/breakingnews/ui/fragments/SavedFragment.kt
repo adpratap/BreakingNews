@@ -47,13 +47,15 @@ class SavedFragment : Fragment(R.layout.fragment_saved) {
             dialogView.findViewById<TextView>(R.id.tvDesc).text = news.description.toString()
             dialogView.findViewById<TextView>(R.id.tvTime).text = news.publishedAt.toString()
             dialogView.findViewById<Button>(R.id.btnDelete).visibility = View.VISIBLE
-            dialogView.findViewById<Button>(R.id.btnDelete).setOnClickListener {
-                roomDBViewModel.deleteFavNews(news)
-            }
             dialog = BottomSheetDialog(requireContext(), R.style.BottomSheetDialogTheme)
             dialog.setContentView(dialogView)
             dialog.show()
-            dialogView.findViewById<Button>(R.id.btnURL).setOnClickListener { _ ->
+
+            dialogView.findViewById<Button>(R.id.btnDelete).setOnClickListener {
+                roomDBViewModel.deleteFavNews(news)
+                dialog.dismiss()
+            }
+            dialogView.findViewById<Button>(R.id.btnURL).setOnClickListener {
                 if (context?.isOnline() == true) {
                     news.url?.let { it1 -> requireContext().webBuilder(it1) }
                 } else {

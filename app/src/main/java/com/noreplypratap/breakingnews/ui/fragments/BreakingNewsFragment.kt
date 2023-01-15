@@ -33,19 +33,27 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
         val newsAdapter = NewsAdapter()
         binding.rvNewsView.adapter = newsAdapter
         recyclerViewOnClick(newsAdapter)
+        subscribeUI(newsAdapter)
+        setupChips(newsAdapter)
+        setupCall()
 
-        hitAPI(newsAdapter)
+        //hitAPI(newsAdapter)
 
         binding.strNewsArticle.setOnRefreshListener {
-            mainViewModel.getBreakingNews(codeIndia, "", "")
-            binding.strNewsArticle.isRefreshing = false
+            setupCall()
+        }
+    }
+
+    private fun setupCall() {
+        if (context?.isOnline() == true) {
             binding.chipsGroup.clearCheck()
             binding.chipIndia.isChecked = true
+            mainViewModel.getBreakingNews(codeIndia, "", "")
+            binding.strNewsArticle.isRefreshing = false
+        } else {
+            requireContext().showToast("No Internet")
+            binding.strNewsArticle.isRefreshing = false
         }
-
-        setupChips(newsAdapter)
-
-
     }
 
     private fun setupChips(newsAdapter: NewsAdapter) {
@@ -102,9 +110,13 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun searchByChips(newsAdapter: NewsAdapter, codeUS: String) {
-        newsAdapter.differ.submitList(null)
-        newsAdapter.notifyDataSetChanged()
-        mainViewModel.getBreakingNews(codeUS, "", "")
+        if (context?.isOnline() == true) {
+            newsAdapter.differ.submitList(null)
+            newsAdapter.notifyDataSetChanged()
+            mainViewModel.getBreakingNews(codeUS, "", "")
+        } else {
+            requireContext().showToast("No Internet...")
+        }
     }
 
     override fun onResume() {
@@ -133,7 +145,6 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
         if (context?.isOnline() == true) {
             subscribeUI(adapter)
         } else {
-            offlineData(adapter)
             requireContext().showToast("No Internet")
         }
 
@@ -158,7 +169,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
     @SuppressLint("NotifyDataSetChanged")
     private fun subscribeUI(adapter: NewsAdapter) {
         showProgressBar()
-        mainViewModel.getBreakingNews(codeIndia, "", "")
+        //mainViewModel.getBreakingNews(codeIndia, "", "")
         mainViewModel.breakingNews.observe(viewLifecycleOwner) { data ->
             when (data) {
                 is Resource.Success -> {
