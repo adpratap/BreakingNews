@@ -14,8 +14,8 @@ fun Context.showToast(toastString : String) {
     Toast.makeText(this,toastString, Toast.LENGTH_SHORT).show()
 }
 
-fun logging(tag : String){
-    Log.d(Constants.TAG,tag)
+fun logging(msg : String){
+    Log.d(Constants.TAG,msg)
 }
 
 fun Context.webBuilder(urlString : String) {

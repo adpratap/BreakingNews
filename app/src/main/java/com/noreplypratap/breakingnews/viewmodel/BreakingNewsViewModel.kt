@@ -1,10 +1,8 @@
 package com.noreplypratap.breakingnews.viewmodel
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.noreplypratap.breakingnews.model.Article
 import com.noreplypratap.breakingnews.model.NewsData
 import com.noreplypratap.breakingnews.repository.Repository
 import com.noreplypratap.breakingnews.utils.Resource

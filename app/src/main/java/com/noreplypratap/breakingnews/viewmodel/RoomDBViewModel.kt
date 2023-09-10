@@ -15,8 +15,8 @@ class RoomDBViewModel @Inject constructor(private val repository: Repository) : 
     fun getSavedNews() : LiveData<List<Article>> = repository.getArticleRoomDB()
 
     //SaveListOfNewsArticle
-    fun saveNews(articles: MutableList<Article>) = viewModelScope.launch {
-        repository.saveArticle(articles)
+    fun saveArticles(articles: MutableList<Article>) = viewModelScope.launch {
+        repository.saveArticles(articles)
     }
 
     //SaveFavNews

@@ -1,49 +1,65 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:elevation="1dp"
-    android:layout_margin="4dp"
-    app:cardCornerRadius="15dp">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <data>
+        <variable
+            name="artical"
+            type="com.noreplypratap.breakingnews.model.Article" />
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        app:cardCornerRadius="18dp"
+        style="?attr/materialCardViewElevatedStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_margin="8dp">
 
-
-        <ImageView
-            android:id="@+id/ivFNewsImage"
-            android:scaleType="centerCrop"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            tools:ignore="ContentDescription" />
-
-
-        <TextView
-            android:id="@+id/tvFNewsHeading"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_margin="5dp"
-            android:textSize="18sp"
-            android:textStyle="bold|italic" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvFNewsBody"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_margin="5dp"
-            android:visibility="gone"
-            android:textSize="15sp"
-            android:textStyle="italic" />
+            <ImageView
+                android:id="@+id/ivFNewsImage"
+                android:layout_width="match_parent"
+                android:layout_height="194dp"
+                imageFromUrl="@{artical.urlToImage.toString()}"
+                android:scaleType="centerCrop"
+                android:contentDescription="NewsImage" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/tvFNewsHeading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{artical.title.toString()}"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="?android:attr/textColorSecondary" />
 
+                <TextView
+                    android:id="@+id/tvFNewsBody"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textSize="18sp"
+                    android:textStyle="italic"
+                    android:text="@{artical.content.toString()}"
+                    android:visibility="gone"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?android:attr/textColorSecondary" />
 
-</androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+</layout>

@@ -1,31 +1,16 @@
 package com.noreplypratap.breakingnews.ui.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.noreplypratap.breakingnews.R
+import com.noreplypratap.breakingnews.databinding.NewsFragmentBinding
 import com.noreplypratap.breakingnews.model.Article
-import com.noreplypratap.breakingnews.utils.Constants
-import com.noreplypratap.breakingnews.utils.glide
 
 class NewsAdapter : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
 
-    class ArticleViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
-        var textView: TextView
-        var textView2: TextView
-        var imageview: ImageView
-
-        init {
-            textView = itemView.findViewById(R.id.tvFNewsHeading)
-            textView2 = itemView.findViewById(R.id.tvFNewsBody)
-            imageview = itemView.findViewById(R.id.ivFNewsImage)
-        }
-    }
+    class ArticleViewHolder(val binding: NewsFragmentBinding) : RecyclerView.ViewHolder(binding.root)
 
 
     private val diffCallBack = object : DiffUtil.ItemCallback<Article>(){
@@ -40,31 +25,23 @@ class NewsAdapter : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
     val differ = AsyncListDiffer(this,diffCallBack)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleViewHolder {
-        return ArticleViewHolder(
-            LayoutInflater.from(parent.context).inflate(
-                R.layout.news_fragment,parent,false
-            )
-        )
+
+        val binding = NewsFragmentBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ArticleViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ArticleViewHolder, position: Int) {
 
         val article = differ.currentList[position]
-
-        holder.itemView.apply {
-            if(article.urlToImage.isNullOrBlank()){
-                context.glide(Constants.DefaultImageURl,holder.imageview)
-            }else{
-                context.glide(article.urlToImage,holder.imageview)
-            }
-            holder.textView.text = article.title
-
-            setOnClickListener {
+        holder.binding.apply {
+            artical = article
+            root.setOnClickListener {
                 onItemClicked?.let {
                     it(article)
                 }
             }
         }
+
 
     }
 

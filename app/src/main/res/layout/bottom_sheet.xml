@@ -16,54 +16,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:layout_marginTop="30dp"
-            android:textSize="18sp"
-            android:textStyle="bold|italic" />
+        <include layout="@layout/news_fragment"/>
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:scaleType="centerCrop"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            tools:ignore="ContentDescription" />
-
-        <TextView
-            android:id="@+id/tvDesc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-
-        <androidx.appcompat.widget.AppCompatButton
+        <Button
+            style="@style/Widget.Material3.Button"
             android:id="@+id/btnURL"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_margin="30dp"
+            android:textSize="12sp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="25dp"
-            android:backgroundTint="@color/material_dynamic_tertiary80"
-            android:text="Full Coverage" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Full Coverage"
+            />
+
+        <Button
+            style="@style/Widget.Material3.Button"
+            android:id="@+id/btnDelete"
+            android:layout_margin="15dp"
+            android:textSize="12sp"
             android:visibility="gone"
             android:layout_marginBottom="25dp"
-            android:backgroundTint="@color/material_dynamic_secondary80"
-            android:text="Delete" />
+            android:backgroundTint="@color/material_dynamic_secondary60"
+            android:text="Delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
 
     </LinearLayout>
 

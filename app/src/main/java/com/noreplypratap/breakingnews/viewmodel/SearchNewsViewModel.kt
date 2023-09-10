@@ -22,7 +22,6 @@ class SearchNewsViewModel @Inject constructor(private val repository: Repository
         val response = repository.searchNewsData(searchQuery)
         searchNews.postValue(handleSearchNewsResponse(response))
     }
-
     private fun handleSearchNewsResponse(response: Response<NewsData>): Resource<NewsData> {
         if (response.isSuccessful) {
             response.body()?.let {

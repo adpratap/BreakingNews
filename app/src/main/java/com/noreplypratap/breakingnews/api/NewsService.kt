@@ -2,7 +2,6 @@ package com.noreplypratap.breakingnews.api
 
 import com.noreplypratap.breakingnews.model.NewsData
 import com.noreplypratap.breakingnews.utils.Constants
-import com.noreplypratap.breakingnews.utils.Constants.APIKey
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -22,7 +21,7 @@ interface NewsService {
         @Query("pageSize")
         pageSize : Int = Constants.pageSize,
         @Query("apikey")
-        apiKey : String = APIKey
+        apiKey : String = Constants.APIKey
     ): Response<NewsData>
 
     @GET("/v2/everything")
@@ -30,9 +29,9 @@ interface NewsService {
         @Query("q")
         query : String,
         @Query("sortBy")
-        sortBy : String = "popularity",
+        sortBy : String = Constants.sortBy,
         @Query("language")
-        language : String = "en",
+        language : String = Constants.language,
         @Query("from")
         dateFrom : String = "",
         @Query("to")
@@ -42,7 +41,7 @@ interface NewsService {
         @Query("pageSize")
         pageSize : Int = Constants.pageSize,
         @Query("apikey")
-        apiKey : String = APIKey
+        apiKey : String = Constants.APIKey
     ): Response<NewsData>
 
 }

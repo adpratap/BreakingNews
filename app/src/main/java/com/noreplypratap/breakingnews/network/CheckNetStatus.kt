@@ -1,4 +1,4 @@
-package com.noreplypratap.breakingnews.utils
+package com.noreplypratap.breakingnews.network
 
 import android.content.Context
 import android.net.ConnectivityManager

@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.noreplypratap.breakingnews.R
 import com.noreplypratap.breakingnews.databinding.FragmentSearchBinding
+import com.noreplypratap.breakingnews.network.isOnline
 import com.noreplypratap.breakingnews.ui.adapters.NewsAdapter
 import com.noreplypratap.breakingnews.utils.*
 import com.noreplypratap.breakingnews.viewmodel.BreakingNewsViewModel
@@ -207,15 +208,18 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search) {
     private fun recyclerViewOnClick(adapter: NewsAdapter) {
         adapter.setOnClickListener {
             val dialogView = layoutInflater.inflate(R.layout.bottom_sheet, null)
-            it.urlToImage?.let { it1 ->
+            val newsUrl: String? = it.urlToImage
+            if (!newsUrl.isNullOrBlank()){
                 requireContext().glide(
-                    it1,
-                    dialogView.findViewById(R.id.imageView)
+                    newsUrl,
+                    dialogView.findViewById(R.id.ivFNewsImage)
                 )
+            }else {
+                dialogView.findViewById<ImageView>(R.id.ivFNewsImage).setImageResource(R.drawable.launcher_new)
             }
-            dialogView.findViewById<TextView>(R.id.tvTitle).text = it.title.toString()
-            dialogView.findViewById<TextView>(R.id.tvDesc).text = it.description.toString()
-            dialogView.findViewById<TextView>(R.id.tvTime).text = it.publishedAt.toString()
+            dialogView.findViewById<TextView>(R.id.tvFNewsHeading).text = it.title.toString()
+            dialogView.findViewById<TextView>(R.id.tvFNewsBody).text = it.description.toString()
+            //dialogView.findViewById<TextView>(R.id.tvTime).text = it.publishedAt.toString()
             dialogView.findViewById<Button>(R.id.btnURL).setOnClickListener { _ ->
                 if (context?.isOnline() == true) {
                     it.url?.let { it1 -> requireContext().webBuilder(it1) }

@@ -7,4 +7,6 @@ object Constants {
     const val TAG = "MVVMOBreakingNews"
     const val pageSize : Int = 20
     val APIKey = getAPIKey()
+    const val language = "en"
+    const val sortBy = "popularity"
 }
