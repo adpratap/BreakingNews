@@ -10,12 +10,11 @@ import android.widget.*
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.noreplypratap.breakingnews.R
 import com.noreplypratap.breakingnews.databinding.FragmentSearchBinding
-import com.noreplypratap.breakingnews.network.isOnline
 import com.noreplypratap.breakingnews.ui.adapters.NewsAdapter
 import com.noreplypratap.breakingnews.utils.*
+import com.noreplypratap.breakingnews.utils.Constants.TAG
 import com.noreplypratap.breakingnews.viewmodel.BreakingNewsViewModel
 import com.noreplypratap.breakingnews.viewmodel.RoomDBViewModel
 import com.noreplypratap.breakingnews.viewmodel.SearchNewsViewModel
@@ -34,7 +33,6 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search) {
     private val searchViewModel: SearchNewsViewModel by viewModels()
     private val mainViewModel: BreakingNewsViewModel by viewModels()
     private val roomDBViewModel: RoomDBViewModel by viewModels()
-    private lateinit var dialog: BottomSheetDialog
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,7 +65,7 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search) {
         }
 
         imageButton?.setOnClickListener {
-            logging("Coming Soon ... ")
+            logMessage(TAG, "Coming Soon ... ")
         }
 
         if (textView != null) {
@@ -81,21 +79,28 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search) {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun mainViewModelObs(newsAdapter: NewsAdapter) {
-        mainViewModel.breakingNews.observe(viewLifecycleOwner) { data ->
+        mainViewModel.remoteArticles.observe(viewLifecycleOwner) { data ->
             when (data) {
                 is Resource.Success -> {
                     data.data?.let {
-                        newsAdapter.differ.submitList(it.articles)
+                        newsAdapter.differ.submitList(it)
                         newsAdapter.notifyDataSetChanged()
                     }
                     hideProgressBar()
                 }
+
                 is Resource.Error -> {
                     hideProgressBar()
-                    logging(data.message.toString())
+                    logMessage(TAG, data.message.toString())
                 }
+
                 is Resource.Loading -> {
                     showProgressBar()
+                }
+
+                else -> {
+                    logMessage(TAG, "data.message.toString()")
+                    hideProgressBar()
                 }
             }
         }
@@ -153,13 +158,14 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search) {
         }
     }
 
-    private fun apiCall(category : String){
+    private fun apiCall(category: String) {
         if (context?.isOnline() == true) {
             mainViewModel.getBreakingNews("", category, "")
         } else {
-            requireContext().showToast("No Internet...")
+            requireContext().showToastMessage("No Internet...")
         }
     }
+
     private fun svSearch(searchView: SearchView, newsAdapter: NewsAdapter) {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
@@ -206,51 +212,34 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search) {
 
     @SuppressLint("InflateParams")
     private fun recyclerViewOnClick(adapter: NewsAdapter) {
-        adapter.setOnClickListener {
-            val dialogView = layoutInflater.inflate(R.layout.bottom_sheet, null)
-            val newsUrl: String? = it.urlToImage
-            if (!newsUrl.isNullOrBlank()){
-                requireContext().glide(
-                    newsUrl,
-                    dialogView.findViewById(R.id.ivFNewsImage)
-                )
-            }else {
-                dialogView.findViewById<ImageView>(R.id.ivFNewsImage).setImageResource(R.drawable.launcher_new)
-            }
-            dialogView.findViewById<TextView>(R.id.tvFNewsHeading).text = it.title.toString()
-            dialogView.findViewById<TextView>(R.id.tvFNewsBody).text = it.description.toString()
-            //dialogView.findViewById<TextView>(R.id.tvTime).text = it.publishedAt.toString()
-            dialogView.findViewById<Button>(R.id.btnURL).setOnClickListener { _ ->
-                if (context?.isOnline() == true) {
-                    it.url?.let { it1 -> requireContext().webBuilder(it1) }
-                } else {
-                    logging("No Internet")
-                    requireContext().showToast("No Internet")
-                }
-            }
-            dialog = BottomSheetDialog(requireContext(), R.style.BottomSheetDialogTheme)
-            dialog.setContentView(dialogView)
-            dialog.show()
-
-            roomDBViewModel.saveFavNews(it)
+        adapter.setOnClickListener { article ->
+            requireContext().showBottomSheetDialog(article, saveArticle = {
+                article.isStared = true
+                roomDBViewModel.saveArticle(article)
+                requireContext().showToastMessage("Saved Article")
+            })
         }
     }
 
+
+
     @SuppressLint("NotifyDataSetChanged")
     private fun setObserver(adapter: NewsAdapter) {
-        searchViewModel.searchNews.observe(viewLifecycleOwner) { data ->
+        searchViewModel.searchNewsArticles.observe(viewLifecycleOwner) { data ->
             when (data) {
                 is Resource.Success -> {
                     data.data?.let {
-                        adapter.differ.submitList(it.articles)
+                        adapter.differ.submitList(it)
                         adapter.notifyDataSetChanged()
                     }
                     hideProgressBar()
                 }
+
                 is Resource.Error -> {
                     hideProgressBar()
-                    logging(data.message.toString())
+                    logMessage(TAG, data.message.toString())
                 }
+
                 is Resource.Loading -> {
                     showProgressBar()
                 }
@@ -264,7 +253,7 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search) {
             searchViewModel.searchNews(sText)
             binding.chipsCategoryGroup.clearCheck()
         } else {
-            context?.showToast("Error ..... ")
+            context?.showToastMessage("Error ..... ")
             adapter.differ.submitList(null)
             adapter.notifyDataSetChanged()
         }

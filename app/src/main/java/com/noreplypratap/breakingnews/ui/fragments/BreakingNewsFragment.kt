@@ -3,17 +3,14 @@ package com.noreplypratap.breakingnews.ui.fragments
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.noreplypratap.breakingnews.R
 import com.noreplypratap.breakingnews.databinding.FragmentBreakingNewsBinding
-import com.noreplypratap.breakingnews.network.isOnline
+import com.noreplypratap.breakingnews.model.Article
 import com.noreplypratap.breakingnews.ui.adapters.NewsAdapter
 import com.noreplypratap.breakingnews.utils.*
 import com.noreplypratap.breakingnews.viewmodel.BreakingNewsViewModel
@@ -22,49 +19,44 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
+    val TAG = "BreakingNewsFragmentTag"
 
     private lateinit var binding: FragmentBreakingNewsBinding
-    private val mainViewModel: BreakingNewsViewModel by viewModels()
-    private val roomDBViewModel: RoomDBViewModel by viewModels()
-    private lateinit var dialog: BottomSheetDialog
+    private val remoteDataViewModel: BreakingNewsViewModel by viewModels()
+    private val localDataViewModel: RoomDBViewModel by viewModels()
+    private val articlesAdapter = NewsAdapter()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentBreakingNewsBinding.bind(view)
+        binding.rvArticles.adapter = articlesAdapter
+        recyclerViewOnClickSetup()
+        loadArticles()
+        refreshListener()
+        setupChips()
 
-        val newsAdapter = NewsAdapter()
-        binding.rvNewsView.adapter = newsAdapter
-        recyclerViewOnClick(newsAdapter)
-        subscribeUI(newsAdapter)
-        setupChips(newsAdapter)
-        setupCall()
-
-        //hitAPI(newsAdapter)
-
+        val receivedValue = requireActivity().intent.getStringExtra("id")
+        logMessage(TAG,"$receivedValue")
+    }
+    private fun refreshListener() {
         binding.strNewsArticle.setOnRefreshListener {
-            setupCall()
+            if (requireContext().isOnline()) {
+                binding.chipsGroup.clearCheck()
+                binding.chipIndia.isChecked = true
+                remoteDataViewModel.getBreakingNews(codeIndia)
+                binding.strNewsArticle.isRefreshing = false
+            } else {
+                binding.strNewsArticle.isRefreshing = false
+            }
         }
     }
-
-    private fun setupCall() {
-        if (context?.isOnline() == true) {
-            binding.chipsGroup.clearCheck()
-            binding.chipIndia.isChecked = true
-            mainViewModel.getBreakingNews(codeIndia, "", "")
-            binding.strNewsArticle.isRefreshing = false
-        } else {
-            requireContext().showToast("No Internet")
-            binding.strNewsArticle.isRefreshing = false
-        }
-    }
-
-    private fun setupChips(newsAdapter: NewsAdapter) {
+    private fun setupChips() {
 
         binding.chipUS.setOnClickListener {
             binding.chipsGroup.clearCheck()
             binding.chipUS.isChecked = true
             if (binding.chipUS.isChecked) {
-                searchByChips(newsAdapter, codeUS)
+                searchByChips(codeUS)
             }
         }
 
@@ -72,7 +64,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
             binding.chipsGroup.clearCheck()
             binding.chipRussia.isChecked = true
             if (binding.chipRussia.isChecked) {
-                searchByChips(newsAdapter, codeRussia)
+                searchByChips(codeRussia)
             }
         }
 
@@ -80,7 +72,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
             binding.chipsGroup.clearCheck()
             binding.chipIndia.isChecked = true
             if (binding.chipIndia.isChecked) {
-                searchByChips(newsAdapter, codeIndia)
+                searchByChips(codeIndia)
             }
         }
 
@@ -88,7 +80,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
             binding.chipsGroup.clearCheck()
             binding.chipBrazil.isChecked = true
             if (binding.chipBrazil.isChecked) {
-                searchByChips(newsAdapter, codeBrazil)
+                searchByChips(codeBrazil)
             }
         }
 
@@ -96,7 +88,7 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
             binding.chipsGroup.clearCheck()
             binding.chipCanada.isChecked = true
             if (binding.chipCanada.isChecked) {
-                searchByChips(newsAdapter, codeCanada)
+                searchByChips(codeCanada)
             }
         }
 
@@ -104,23 +96,19 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
             binding.chipsGroup.clearCheck()
             binding.chipSwitzerland.isChecked = true
             if (binding.chipSwitzerland.isChecked) {
-                searchByChips(newsAdapter, codeSwitzerland)
+                searchByChips(codeSwitzerland)
             }
         }
 
     }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun searchByChips(newsAdapter: NewsAdapter, codeUS: String) {
-        if (context?.isOnline() == true) {
-            newsAdapter.differ.submitList(null)
-            newsAdapter.notifyDataSetChanged()
-            mainViewModel.getBreakingNews(codeUS, "", "")
+    private fun searchByChips(cc: String) {
+        if (requireContext().isOnline()) {
+            showThisList(null)
+            remoteDataViewModel.getBreakingNews(cc)
         } else {
-            requireContext().showToast("No Internet...")
+            requireContext().showToastMessage("No Internet...")
         }
     }
-
     override fun onResume() {
         super.onResume()
         val textView = activity?.findViewById<TextView>(R.id.tvAppBar)
@@ -141,95 +129,54 @@ class BreakingNewsFragment : Fragment(R.layout.fragment_breaking_news) {
         }
 
     }
-
-    private fun hitAPI(adapter: NewsAdapter) {
-        binding.chipIndia.isChecked = true
-        if (context?.isOnline() == true) {
-            subscribeUI(adapter)
-        } else {
-            requireContext().showToast("No Internet")
-        }
-
-    }
-
-    private fun hideProgressBar() {
-        binding.progressBar.visibility = View.GONE
-    }
-
-    private fun showProgressBar() {
-        binding.progressBar.visibility = View.VISIBLE
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun offlineData(adapter: NewsAdapter) {
-        roomDBViewModel.getSavedNews().observe(viewLifecycleOwner) {
-            adapter.differ.submitList(it)
-            adapter.notifyDataSetChanged()
-        }
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun subscribeUI(adapter: NewsAdapter) {
+    private fun loadArticles() {
         showProgressBar()
-        //mainViewModel.getBreakingNews(codeIndia, "", "")
-        mainViewModel.breakingNews.observe(viewLifecycleOwner) { data ->
+        remoteDataViewModel.getBreakingNews(codeIndia)
+        remoteDataViewModel.remoteArticles.observe(viewLifecycleOwner) { data ->
             when (data) {
                 is Resource.Success -> {
                     data.data?.let {
-
-                        //Set to UI
-                        adapter.differ.submitList(it.articles)
-                        adapter.notifyDataSetChanged()
-
-                        //Save To DB
-                        //roomDBViewModel.saveNews(it.articles)
+                        hideProgressBar()
+                        showThisList(it)
                     }
                     hideProgressBar()
                 }
                 is Resource.Error -> {
                     hideProgressBar()
-                    logging(data.message.toString())
+                    logMessage(TAG, data.message.toString())
                 }
                 is Resource.Loading -> {
                     showProgressBar()
                 }
-
-                else -> {}
             }
+
         }
     }
-
-    @SuppressLint("InflateParams")
-    private fun recyclerViewOnClick(newsAdapter: NewsAdapter) {
-        newsAdapter.setOnClickListener { news ->
-
-            val dialogView = layoutInflater.inflate(R.layout.bottom_sheet, null)
-            val newsUrl: String? = news.urlToImage
-            if (!newsUrl.isNullOrBlank()){
-                requireContext().glide(
-                    newsUrl,
-                    dialogView.findViewById(R.id.ivFNewsImage)
-                )
-            }else {
-                dialogView.findViewById<ImageView>(R.id.ivFNewsImage).setImageResource(R.drawable.launcher_new)
-            }
-            dialogView.findViewById<TextView>(R.id.tvFNewsHeading).text = news.title.toString()
-            dialogView.findViewById<TextView>(R.id.tvFNewsBody).text = news.description.toString()
-            //dialogView.findViewById<TextView>(R.id.tvTime).text = news.publishedAt.toString()
-            dialog = BottomSheetDialog(requireContext(), R.style.BottomSheetDialogTheme)
-            dialog.setContentView(dialogView)
-            dialog.show()
-            dialogView.findViewById<Button>(R.id.btnURL).setOnClickListener {
-                if (context?.isOnline() == true) {
-                    news.url?.let { it1 -> requireContext().webBuilder(it1) }
-                } else {
-                    logging("No Internet")
-                    requireContext().showToast("No Internet")
+    @SuppressLint("NotifyDataSetChanged")
+    private fun showThisList(it: List<Article>?) {
+        articlesAdapter.differ.submitList(it)
+        articlesAdapter.notifyDataSetChanged()
+    }
+    private fun recyclerViewOnClickSetup() {
+        articlesAdapter.setOnClickListener { article ->
+            requireContext().showBottomSheetDialog(article, saveArticle = {
+                val list = localDataViewModel.savedArticles.value
+                if (list?.contains(article) == true){
+                    article.isStared = true
+                    localDataViewModel.updateArticle(article)
+                }else {
+                    article.isStared = true
+                    localDataViewModel.saveArticle(article)
                 }
-            }
-            //Save to DB
-            roomDBViewModel.saveFavNews(news)
+                requireContext().showToastMessage("Saved Article")
+            })
         }
+    }
+    private fun hideProgressBar() {
+        binding.progressBar.visibility = View.GONE
+    }
+    private fun showProgressBar() {
+        binding.progressBar.visibility = View.VISIBLE
     }
 
 }

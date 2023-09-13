@@ -5,6 +5,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+
     <application
         android:name=".BreakingNewsApplication"
         android:allowBackup="true"
@@ -35,6 +39,14 @@
             android:authorities="${applicationId}.androidx-startup"
             tools:node="remove">
         </provider>
+
+        <receiver
+            android:name=".receiver.SaveArticleReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.noreplypratap.breakingnews.SAVE_ARTICLE_ACTION" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

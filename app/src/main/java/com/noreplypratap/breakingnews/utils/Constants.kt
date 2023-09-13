@@ -2,11 +2,13 @@ package com.noreplypratap.breakingnews.utils
 
 object Constants {
     const val BaseURL = "https://newsapi.org/"
-    const val DefaultImageURl =
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQsq1NacYKHKS-RudSBgbLZa_ndkD-lmmQfA&usqp=CAU"
     const val TAG = "MVVMOBreakingNews"
-    const val pageSize : Int = 20
+    const val pageSize : Int = 5
+    var pageNo : Int = 1
     val APIKey = getAPIKey()
     const val language = "en"
     const val sortBy = "popularity"
+    const val CHANNEL_ID = "notification_channel"
+    const val NOTIFICATION_ID = 1
+
 }

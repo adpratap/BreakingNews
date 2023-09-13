@@ -6,22 +6,34 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.tabs.TabLayoutMediator
+import com.noreplypratap.breakingnews.BreakingNewsApplication
 import com.noreplypratap.breakingnews.R
 import com.noreplypratap.breakingnews.databinding.ActivityNewsBinding
 import com.noreplypratap.breakingnews.ui.adapters.ViewPagerAdapter
+import com.noreplypratap.breakingnews.utils.logMessage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.math.log
 
 @AndroidEntryPoint
 class NewsActivity : AppCompatActivity(){
 
-    private lateinit var binding : ActivityNewsBinding
+    val TAG = "NewsActivityTag"
+
+    private var _binding:  ActivityNewsBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_news)
+        _binding = DataBindingUtil.setContentView(this,R.layout.activity_news)
+
+        //Request Permissions...
+        val breakingNewsApplication = application as BreakingNewsApplication
+        breakingNewsApplication.requestPermissions(this)
+
+        //Setup View Pager...
         binding.viewPager.adapter = ViewPagerAdapter(this)
-        TabLayoutMediator(binding.tabLayout,binding.viewPager){ tab,pos ->
+        TabLayoutMediator(binding.tabLayout, binding.viewPager){ tab, pos ->
             tab.text = when(pos){
                 0 -> {"News"}
                 1 -> {"Search"}
@@ -32,5 +44,9 @@ class NewsActivity : AppCompatActivity(){
             }
         }.attach()
 
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 }

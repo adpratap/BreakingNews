@@ -1,4 +1,4 @@
-package com.noreplypratap.breakingnews.db
+package com.noreplypratap.breakingnews.data.local
 
 import android.content.Context
 import androidx.room.Database

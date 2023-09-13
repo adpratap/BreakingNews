@@ -1,4 +1,4 @@
-package com.noreplypratap.breakingnews.network
+package com.noreplypratap.breakingnews.utils
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -12,15 +12,17 @@ fun Context.isOnline() : Boolean {
         connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
     if (capabilities != null) {
         if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-            Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
+            logMessage("InternetStatus", "Online", Log.INFO)
             return true
         } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-            Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
+            logMessage("InternetStatus", "Online", Log.INFO)
             return true
         } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-            Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
+            logMessage("InternetStatus", "Online", Log.INFO)
             return true
         }
     }
+    logMessage("InternetStatus", "No Internet", Log.INFO)
+    this.showToastMessage("No Internet")
     return false
 }

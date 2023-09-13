@@ -1,4 +1,4 @@
-package com.noreplypratap.breakingnews.newsworker
+package com.noreplypratap.breakingnews.worker
 
 import android.content.Context
 import androidx.work.ListenableWorker

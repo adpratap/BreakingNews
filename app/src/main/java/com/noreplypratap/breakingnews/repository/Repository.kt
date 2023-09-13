@@ -1,24 +1,49 @@
 package com.noreplypratap.breakingnews.repository
 
-import com.noreplypratap.breakingnews.api.NewsService
-import com.noreplypratap.breakingnews.db.NewsArticleDao
+import androidx.lifecycle.LiveData
+import com.noreplypratap.breakingnews.data.remote.NewsService
+import com.noreplypratap.breakingnews.data.local.NewsArticleDao
 import com.noreplypratap.breakingnews.model.Article
+import com.noreplypratap.breakingnews.model.NewsData
+import retrofit2.Response
 import javax.inject.Inject
-
-
 class Repository @Inject constructor(
     private val newsService: NewsService,
     private val newsArticleDao: NewsArticleDao
 ) {
-    suspend fun getNewsData(countryCode: String, category: String, q: String) =
-        newsService.loadNewsFormAPI(countryCode, category, q)
+    //api
+    suspend fun loadArticles(
+        countryCode: String,
+        category: String = "",
+        q: String = ""
+    ): Response<NewsData> {
+        return newsService.getLiveArticles(countryCode, category, q)
+    }
 
-    suspend fun searchNewsData(queryString: String) = newsService.searchNews(queryString)
+    //api
+    suspend fun searchArticlesOnline(queryString: String): Response<NewsData> {
+        return newsService.searchArticles(queryString)
+    }
 
-    suspend fun deleteFavNew(article: Article) = newsArticleDao.deleteFavNews(article)
+    //LOCAL DB
+    suspend fun updateArticle(article: Article) {
+        newsArticleDao.updateArticle(article)
+    }
+    suspend fun saveArticle(article: Article) {
+        newsArticleDao.saveArticle(article)
+    }
+    suspend fun saveArticles(articles: MutableList<Article>) {
+        newsArticleDao.createArticles(articles)
+    }
 
-    fun getArticleRoomDB() = newsArticleDao.getArticlesRoomDB()
-    suspend fun saveArticles(articles: MutableList<Article>) = newsArticleDao.saveArticle(articles)
-    suspend fun saveFavNews(article: Article) = newsArticleDao.saveFavNews(article)
+    suspend fun deleteEverything() {
+        newsArticleDao.deleteEverything()
+    }
+    fun readArticles(): LiveData<List<Article>> {
+        return newsArticleDao.readArticles()
+    }
 
 }
+
+
+

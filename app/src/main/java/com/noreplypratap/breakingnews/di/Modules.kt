@@ -1,9 +1,10 @@
 package com.noreplypratap.breakingnews.di
 
 import android.app.Application
-import com.noreplypratap.breakingnews.api.NewsService
-import com.noreplypratap.breakingnews.db.DatabaseArticles
-import com.noreplypratap.breakingnews.db.NewsArticleDao
+import com.noreplypratap.breakingnews.data.remote.NewsService
+import com.noreplypratap.breakingnews.data.local.DatabaseArticles
+import com.noreplypratap.breakingnews.data.local.NewsArticleDao
+import com.noreplypratap.breakingnews.repository.Repository
 import com.noreplypratap.breakingnews.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -17,7 +18,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ModuleHilt {
+object Modules {
 
     @Provides
     @Singleton
@@ -30,6 +31,12 @@ object ModuleHilt {
     fun provideRetrofit(@BaseURl base_URL: String , okHttpClient: OkHttpClient ): Retrofit {
         return Retrofit.Builder().baseUrl(base_URL)
             .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRepository(newsService: NewsService,newsArticleDao: NewsArticleDao): Repository {
+        return Repository(newsService,newsArticleDao)
     }
 
     @Provides

@@ -9,9 +9,7 @@ import com.noreplypratap.breakingnews.databinding.NewsFragmentBinding
 import com.noreplypratap.breakingnews.model.Article
 
 class NewsAdapter : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
-
     class ArticleViewHolder(val binding: NewsFragmentBinding) : RecyclerView.ViewHolder(binding.root)
-
 
     private val diffCallBack = object : DiffUtil.ItemCallback<Article>(){
         override fun areItemsTheSame(oldItem: Article, newItem: Article): Boolean {
@@ -22,7 +20,7 @@ class NewsAdapter : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
         }
     }
 
-    val differ = AsyncListDiffer(this,diffCallBack)
+    val differ = AsyncListDiffer(this, diffCallBack)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleViewHolder {
 
@@ -31,7 +29,6 @@ class NewsAdapter : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ArticleViewHolder, position: Int) {
-
         val article = differ.currentList[position]
         holder.binding.apply {
             artical = article
@@ -41,14 +38,11 @@ class NewsAdapter : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
                 }
             }
         }
-
-
     }
 
     override fun getItemCount() = differ.currentList.size
 
     private var onItemClicked : ((Article) -> Unit)? = null
-
     fun setOnClickListener(listener : (Article) -> Unit){
         onItemClicked = listener
     }

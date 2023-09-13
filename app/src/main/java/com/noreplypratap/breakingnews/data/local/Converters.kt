@@ -1,4 +1,4 @@
-package com.noreplypratap.breakingnews.db
+package com.noreplypratap.breakingnews.data.local
 
 import androidx.room.TypeConverter
 import com.noreplypratap.breakingnews.model.Source

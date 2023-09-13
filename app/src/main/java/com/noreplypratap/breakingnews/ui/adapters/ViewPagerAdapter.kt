@@ -9,9 +9,7 @@ import com.noreplypratap.breakingnews.ui.fragments.SavedFragment
 import com.noreplypratap.breakingnews.ui.fragments.SearchNewsFragment
 
 class ViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
-
     override fun getItemCount() = 3
-
     override fun createFragment(position: Int): Fragment {
         return when(position){
             0 -> {BreakingNewsFragment()}

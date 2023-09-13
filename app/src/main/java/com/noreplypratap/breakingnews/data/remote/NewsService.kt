@@ -1,4 +1,4 @@
-package com.noreplypratap.breakingnews.api
+package com.noreplypratap.breakingnews.data.remote
 
 import com.noreplypratap.breakingnews.model.NewsData
 import com.noreplypratap.breakingnews.utils.Constants
@@ -9,7 +9,7 @@ import retrofit2.http.Query
 interface NewsService {
 
     @GET("/v2/top-headlines")
-    suspend fun loadNewsFormAPI(
+    suspend fun getLiveArticles(
         @Query("country")
         countryCode : String,
         @Query("category")
@@ -25,7 +25,7 @@ interface NewsService {
     ): Response<NewsData>
 
     @GET("/v2/everything")
-    suspend fun searchNews(
+    suspend fun searchArticles(
         @Query("q")
         query : String,
         @Query("sortBy")
