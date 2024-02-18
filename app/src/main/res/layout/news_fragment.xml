@@ -5,7 +5,7 @@
     <data>
         <variable
             name="artical"
-            type="com.noreplypratap.breakingnews.model.Article" />
+            type="com.noreplypratap.domain.model.NewsArticle" />
 
     </data>
 

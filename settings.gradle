@@ -14,3 +14,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Breaking News"
 include ':app'
+include ':domain'
+include ':data'
