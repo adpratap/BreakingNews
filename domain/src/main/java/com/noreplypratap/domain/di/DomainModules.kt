@@ -7,7 +7,7 @@ import com.noreplypratap.domain.usecases.local.DeleteArticleUseCase
 import com.noreplypratap.domain.usecases.local.DeleteDatabaseUseCase
 import com.noreplypratap.domain.usecases.local.ReadArticleUseCase
 import com.noreplypratap.domain.usecases.local.UpdateArticleUseCase
-import com.noreplypratap.domain.usecases.remote.GetArticlesUseCase
+import com.noreplypratap.domain.usecases.remote.RemoteArticlesUseCase
 import com.noreplypratap.domain.usecases.remote.SearchArticlesUseCase
 import dagger.Module
 import dagger.Provides
@@ -22,8 +22,8 @@ object DomainModules {
     // Remote
     @Provides
     @Singleton
-    fun provideGetNewsArticlesUseCase(repository: RemoteRepository): GetArticlesUseCase =
-        GetArticlesUseCase(repository)
+    fun provideGetNewsArticlesUseCase(repository: RemoteRepository): RemoteArticlesUseCase =
+        RemoteArticlesUseCase(repository)
 
     @Provides
     @Singleton

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import javax.inject.Inject
 
-class GetArticlesUseCase @Inject constructor(
+class RemoteArticlesUseCase @Inject constructor(
     private val repository: RemoteRepository
 ) {
     operator fun invoke(

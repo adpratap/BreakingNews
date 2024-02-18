@@ -14,7 +14,7 @@ import com.noreplypratap.breakingnews.core.utils.codeIndia
 import com.noreplypratap.breakingnews.core.utils.isOnline
 import com.noreplypratap.breakingnews.core.utils.logMessage
 import com.noreplypratap.domain.model.NewsArticle
-import com.noreplypratap.domain.usecases.remote.GetArticlesUseCase
+import com.noreplypratap.domain.usecases.remote.RemoteArticlesUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +26,7 @@ const val TAG = "NewsWorkerTAG"
 class NewsWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted params: WorkerParameters,
-    @Assisted private val getArticlesUseCase: GetArticlesUseCase
+    @Assisted private val getArticlesUseCase: RemoteArticlesUseCase
 ) : Worker(context, params) {
     var counter: Int = 0
     private lateinit var notificationManager: NotificationManager
