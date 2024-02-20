@@ -5,4 +5,9 @@ import javax.inject.Qualifier
 @Qualifier
 @MustBeDocumented
 @Retention(AnnotationRetention.RUNTIME)
-annotation class APIKey
+annotation class API_KEY
+
+@Qualifier
+@MustBeDocumented
+@Retention(AnnotationRetention.RUNTIME)
+annotation class BASE_URl

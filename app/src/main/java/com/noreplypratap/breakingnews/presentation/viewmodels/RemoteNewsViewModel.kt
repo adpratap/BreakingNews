@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.noreplypratap.domain.model.NewsArticle
+import com.noreplypratap.domain.model.RemoteUseCases
 import com.noreplypratap.domain.usecases.remote.RemoteArticlesUseCase
 import com.noreplypratap.domain.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,16 +15,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RemoteNewsViewModel @Inject constructor(
-    private val getArticlesUseCase: RemoteArticlesUseCase
+    private val remoteUseCases: RemoteUseCases
 ) : ViewModel() {
     private val _remoteArticles = MutableLiveData<Resource<List<NewsArticle>>>()
     val remoteArticles: LiveData<Resource<List<NewsArticle>>> get() = _remoteArticles
     fun getBreakingNews(countryCode: String, category: String = "", query: String = "") {
         viewModelScope.launch(Dispatchers.IO) {
-            getArticlesUseCase(countryCode, category, query).collect { data ->
-
+            remoteUseCases.remoteArticlesUseCase(countryCode, category, query).collect { data ->
                 _remoteArticles.postValue(data)
-
             }
         }
     }

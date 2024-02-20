@@ -1,9 +1,10 @@
 package com.noreplypratap.data.di
 
 import android.app.Application
+import androidx.room.Room
 import com.noreplypratap.data.repository.LocalRepositoryImpl
 import com.noreplypratap.data.repository.RemoteRepositoryImpl
-import com.noreplypratap.data.source.local.DatabaseArticles
+import com.noreplypratap.data.source.local.NewsArticleDatabase
 import com.noreplypratap.data.source.local.NewsArticleDao
 import com.noreplypratap.data.source.remote.NewsApiService
 import com.noreplypratap.data.source.remote.ApiConstants
@@ -21,7 +22,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DataModules {
+object DataModule {
 
     @Provides
     @Singleton
@@ -43,7 +44,7 @@ object DataModules {
 
     @Provides
     @Singleton
-    fun provideRetrofit(@BaseURl baseURL: String, okHttpClient: OkHttpClient ): Retrofit {
+    fun provideRetrofit(@BASE_URl baseURL: String, okHttpClient: OkHttpClient ): Retrofit {
         return Retrofit.Builder().baseUrl(baseURL)
             .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build()
     }
@@ -58,24 +59,22 @@ object DataModules {
 
     @Provides
     @Singleton
-    fun provideDatabase(context: Application) : DatabaseArticles {
-        return DatabaseArticles.createDatabase(context)
+    fun provideDatabase(context: Application) : NewsArticleDatabase {
+        return Room.databaseBuilder(
+            context,
+            NewsArticleDatabase::class.java,
+            NewsArticleDatabase.DATABASE_NAME
+        ).build()
     }
 
     @Provides
     @Singleton
-    fun provideNewsDao(databaseArticles: DatabaseArticles) : NewsArticleDao {
-        return databaseArticles.getArticleDao()
+    fun provideNewsDao(databaseArticles: NewsArticleDatabase) : NewsArticleDao {
+        return databaseArticles.newsArticleDao
     }
 
     @Provides
-    @APIKey
-    fun provideAPIKey(): String {
-        return ApiConstants.APIKey
-    }
-
-    @Provides
-    @BaseURl
+    @BASE_URl
     fun provideBaseURL(): String {
         return ApiConstants.BaseURL
     }
